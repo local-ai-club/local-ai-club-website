@@ -32,6 +32,19 @@ npm run build
 npm test
 ```
 
+GitHub Pages 静态导出：
+
+```bash
+npm run build:pages
+```
+
+导出结果位于 `dist/client/`。仓库中的 `.github/workflows/pages.yml` 会在
+`main` 分支更新时自动构建和部署，并根据 GitHub Pages 配置自动处理仓库子路径或自定义域名。
+
+首次使用时，请在仓库的 **Settings → Pages** 中将发布来源设置为
+**GitHub Actions**。绑定正式域名时，在同一页面将 Custom domain 设置为
+`local-ai.club`。
+
 ## 项目结构
 
 ```text

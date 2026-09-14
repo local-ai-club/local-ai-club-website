@@ -10,6 +10,7 @@ const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
 const isCodexSeatbeltSandbox = process.env.CODEX_SANDBOX === "seatbelt";
 
 export default defineConfig(async () => {
+  const pagesBasePath = process.env.PAGES_BASE_PATH?.trim().replace(/\/$/, "");
   const hostingConfig = await readFile(
     new URL("./.openai/hosting.json", import.meta.url),
     "utf8",
@@ -49,6 +50,7 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    base: pagesBasePath ? `${pagesBasePath}/` : "/",
     server: {
       host: "0.0.0.0",
       allowedHosts: ["terminal.local"],
