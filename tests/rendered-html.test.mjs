@@ -34,7 +34,7 @@ test("renders Local AI Club product metadata and core entry points", async () =>
   assert.match(html, /企业 Agent/);
 });
 
-test("exports a complete static GitHub Pages artifact", async () => {
+test("exports a complete static Cloudflare Pages artifact", async () => {
   const html = await readFile(
     new URL("../dist/client/index.html", import.meta.url),
     "utf8",
@@ -42,6 +42,8 @@ test("exports a complete static GitHub Pages artifact", async () => {
 
   assert.match(html, /<title>Local AI Club 网站原型<\/title>/i);
   assert.match(html, /https:\/\/local-ai\.club\/og\.png/);
+  assert.equal((html.match(/src="\/logo\.png"/g) ?? []).length, 3);
+  await access(new URL("../dist/client/logo.png", import.meta.url));
   assert.match(html, /(?:href|src)="\/assets\//);
   assert.doesNotMatch(html, /\/local-ai-club-website\/assets\//);
   await access(new URL("../dist/client/.nojekyll", import.meta.url));

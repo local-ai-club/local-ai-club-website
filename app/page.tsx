@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 
 type View = "home" | "learn" | "benchmarks" | "projects" | "agents" | "bounties" | "community";
 type Lang = "zh" | "en";
@@ -292,7 +293,7 @@ const purposeChoices = [
 ];
 
 function BrandMark() {
-  return <div className="brand-mark" aria-hidden="true"><span className="brand-core">AI</span><span className="brand-signal" /></div>;
+  return <Image className="brand-mark" src="/logo.png" alt="Local AI Club logo" width={1254} height={1254} unoptimized />;
 }
 
 export default function Home() {
@@ -373,7 +374,7 @@ export default function Home() {
           </div>
           <div className="signal-panel" aria-label={t.signalAria}>
             <div className="signal-head"><span>LOCAL STACK / 01</span><span className="live-dot">LIVE</span></div>
-            <div className="orbit-wrap"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orbit orbit-three" /><div className="center-chip"><span>LOCAL</span><strong>AI</strong><small>RUNS HERE</small></div><span className="node node-model">OPEN<br />MODELS</span><span className="node node-device">YOUR<br />DEVICE</span><span className="node node-data">PRIVATE<br />DATA</span><span className="node node-app">REAL<br />APPS</span></div>
+            <div className="orbit-wrap"><div className="orbit orbit-one" /><div className="orbit orbit-two" /><div className="orbit orbit-three" /><div className="center-chip"><Image className="hero-logo" src="/logo.png" alt="Local AI Club logo" width={1254} height={1254} priority unoptimized /></div><span className="node node-model">OPEN<br />MODELS</span><span className="node node-device">YOUR<br />DEVICE</span><span className="node node-data">PRIVATE<br />DATA</span><span className="node node-app">REAL<br />APPS</span></div>
             <div className="signal-foot"><span>DEVICE OWNED</span><span>OFFLINE READY</span><span>OPEN SOURCE</span></div>
           </div>
         </section>
