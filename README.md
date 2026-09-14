@@ -32,24 +32,23 @@ npm run build
 npm test
 ```
 
-GitHub Pages 静态导出：
+Cloudflare Pages 静态导出：
 
 ```bash
 npm run build:pages
 ```
 
-导出结果位于 `dist/client/`。仓库中的 `.github/workflows/pages.yml` 会在
-`main` 分支更新时自动构建和部署，并根据 GitHub Pages 配置自动处理仓库子路径或自定义域名。
+导出结果位于 `dist/client/`。生产部署和 Pull Request 预览由 Cloudflare Pages 的
+GitHub 原生集成负责；GitHub Actions 只运行 lint、构建和测试，不持有 Cloudflare 部署密钥。
 
-首次使用时，请在仓库的 **Settings → Pages** 中将发布来源设置为
-**GitHub Actions**。绑定正式域名时，在同一页面将 Custom domain 设置为
-`local-ai.club`。
+首次绑定所需的构建参数、Preview 分支设置和验收方式见
+[Cloudflare Pages 部署说明](docs/CLOUDFLARE_PAGES.md)。
 
 ## 项目结构
 
 ```text
 app/        页面、交互与全局样式
-public/     图标与品牌分享图
+public/     Logo、图标与品牌分享图
 worker/     Cloudflare Worker 入口
 docs/       社区方案、产品需求文档与汇报材料
 tests/      渲染结果测试

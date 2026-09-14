@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 
 type View = "home" | "learn" | "benchmarks" | "projects" | "agents" | "bounties" | "community";
 type Lang = "zh" | "en";
@@ -292,7 +293,7 @@ const purposeChoices = [
 ];
 
 function BrandMark() {
-  return <div className="brand-mark" aria-hidden="true"><span className="brand-core">AI</span><span className="brand-signal" /></div>;
+  return <Image className="brand-mark" src="/logo.png" alt="Local AI Club logo" width={1254} height={1254} unoptimized />;
 }
 
 export default function Home() {
