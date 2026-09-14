@@ -38,8 +38,10 @@ jobs:
 
       - name: Build static site
         env:
-          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          # local-ai.club is the canonical Pages domain, so assets must be
+          # emitted from the domain root instead of /local-ai-club-website/.
+          PAGES_BASE_PATH: ""
+          SITE_URL: https://local-ai.club
         run: npm run build:pages
 
       - name: Upload Pages artifact
