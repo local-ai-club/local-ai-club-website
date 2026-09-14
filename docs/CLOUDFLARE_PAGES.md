@@ -16,8 +16,9 @@
 | Root directory | `/`（仓库根目录） |
 | Environment variable | `NODE_VERSION=24` |
 
-在 Production 环境额外设置 `SITE_URL=https://local-ai.club`。Preview 环境不要设置
-`SITE_URL`，构建会自动使用 Cloudflare 提供的 `CF_PAGES_URL` 生成预览版本的元数据地址。
+使用默认 `*.pages.dev` 域名时，Production 和 Preview 环境都不要设置 `SITE_URL`，
+构建会自动使用 Cloudflare 提供的 `CF_PAGES_URL` 生成当前部署的元数据地址。以后绑定
+自定义域名时，再只为 Production 环境设置对应的 `SITE_URL`。
 
 ## PR Preview
 
