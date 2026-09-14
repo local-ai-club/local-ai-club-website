@@ -36,4 +36,4 @@ await Promise.all([
   writeFile(new URL(".nojekyll", outputDirectory), "", "utf8"),
 ]);
 
-console.log("Cloudflare Pages artifact exported to dist/client");
+console.log("Static Pages artifact exported to dist/client");

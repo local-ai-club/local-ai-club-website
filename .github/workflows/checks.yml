@@ -34,5 +34,5 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Build and test Cloudflare Pages artifact
+      - name: Build and test static Pages artifact
         run: npm test

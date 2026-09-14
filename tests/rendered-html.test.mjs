@@ -34,7 +34,7 @@ test("renders Local AI Club product metadata and core entry points", async () =>
   assert.match(html, /企业 Agent/);
 });
 
-test("exports a complete static Cloudflare Pages artifact", async () => {
+test("exports a complete static Pages artifact", async () => {
   const html = await readFile(
     new URL("../dist/client/index.html", import.meta.url),
     "utf8",

@@ -32,17 +32,18 @@ npm run build
 npm test
 ```
 
-Cloudflare Pages 静态导出：
+Pages 静态导出：
 
 ```bash
 npm run build:pages
 ```
 
-导出结果位于 `dist/client/`。生产部署和 Pull Request 预览由 Cloudflare Pages 的
-GitHub 原生集成负责；GitHub Actions 只运行 lint、构建和测试，不持有 Cloudflare 部署密钥。
+导出结果位于 `dist/client/`。`.github/workflows/pages.yml` 在 `main` 更新时部署到
+GitHub Pages；Cloudflare Pages 的 GitHub 原生集成只为非生产分支和 Pull Request
+提供预览，不负责生产部署。
 
-首次绑定所需的构建参数、Preview 分支设置和验收方式见
-[Cloudflare Pages 部署说明](docs/CLOUDFLARE_PAGES.md)。
+Cloudflare Preview 的分支设置和验收方式见
+[Cloudflare Pages PR Preview 说明](docs/CLOUDFLARE_PAGES.md)。
 
 ## 项目结构
 
