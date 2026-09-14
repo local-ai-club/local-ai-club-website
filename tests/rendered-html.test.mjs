@@ -42,7 +42,9 @@ test("exports a complete static Cloudflare Pages artifact", async () => {
 
   assert.match(html, /<title>Local AI Club 网站原型<\/title>/i);
   assert.match(html, /https:\/\/local-ai\.club\/og\.png/);
-  assert.match(html, /src="\/logo\.png"/);
+  assert.equal((html.match(/src="\/logo\.png"/g) ?? []).length, 3);
   await access(new URL("../dist/client/logo.png", import.meta.url));
+  assert.match(html, /(?:href|src)="\/assets\//);
+  assert.doesNotMatch(html, /\/local-ai-club-website\/assets\//);
   await access(new URL("../dist/client/.nojekyll", import.meta.url));
 });
