@@ -56,11 +56,15 @@ test("renders localized section routes", async () => {
   assert.match(learn, /KNOWLEDGE PATHS/);
   assert.match(learn, /href="\/learn\/run-first-local-model"/);
   assert.match(learn, /阅读全文/);
+  assert.match(learn, /href="\/community\/article-contribution-guide"/);
+  assert.doesNotMatch(learn, /Ollama、llama\.cpp 与 LM Studio 应该怎样选择/);
+  assert.doesNotMatch(learn, /构建完全离线的个人文档知识库/);
   assert.match(learn, /hrefLang="en" href="https:\/\/local-ai\.club\/en\/learn"/);
 
   const enLearn = await fetchHtml("/en/learn");
   assert.match(enLearn, /href="\/en\/learn\/run-first-local-model"/);
   assert.match(enLearn, /Read article/);
+  assert.match(enLearn, /href="\/en\/community\/article-contribution-guide"/);
 
   const agents = await fetchHtml("/en/agents");
   assert.match(agents, /<title>Enterprise Agents · Local AI Club<\/title>/i);
@@ -84,6 +88,19 @@ test("renders a Velite article in both languages", async () => {
   assert.match(en, /class="article-code" data-lang="bash"/);
   assert.match(en, />Copy<\/button>/);
   assert.match(en, /hrefLang="zh-CN" href="https:\/\/local-ai\.club\/learn\/run-first-local-model"/);
+});
+
+test("renders the article contribution guide in both languages", async () => {
+  const zh = await fetchHtml("/community/article-contribution-guide");
+  assert.match(zh, /<title>怎样给 Local AI Club 写一篇文章 · Local AI Club<\/title>/i);
+  assert.match(zh, /用一对 Markdown 文件提交中英双语文章/);
+  assert.match(zh, /content\/articles\/\{section\}\/\{slug\}\/index\.zh\.md/);
+  assert.match(zh, /hrefLang="en" href="https:\/\/local-ai\.club\/en\/community\/article-contribution-guide"/);
+
+  const en = await fetchHtml("/en/community/article-contribution-guide");
+  assert.match(en, /<title>How to contribute an article to Local AI Club · Local AI Club<\/title>/i);
+  assert.match(en, /Submit bilingual articles as a Markdown pair/);
+  assert.match(en, /hrefLang="zh-CN" href="https:\/\/local-ai\.club\/community\/article-contribution-guide"/);
 });
 
 test("exports a complete static Pages artifact", async () => {
@@ -117,4 +134,6 @@ test("exports a complete static Pages artifact", async () => {
   await access(new URL("../dist/client/.nojekyll", import.meta.url));
   await access(new URL("../dist/client/learn/run-first-local-model/index.html", import.meta.url));
   await access(new URL("../dist/client/en/learn/run-first-local-model/index.html", import.meta.url));
+  await access(new URL("../dist/client/community/article-contribution-guide/index.html", import.meta.url));
+  await access(new URL("../dist/client/en/community/article-contribution-guide/index.html", import.meta.url));
 });

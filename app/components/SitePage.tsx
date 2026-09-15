@@ -41,12 +41,7 @@ const content: Record<Exclude<View, "home">, SectionContent> = {
     title: { zh: "从第一次运行，到构建完整的本地 AI", en: "From your first run to building complete local AI" },
     intro: { zh: "围绕设备、模型、推理、应用与安全组织的连续知识体系。每篇实践内容都标明版本、环境与复现状态。", en: "A continuous body of knowledge organized around devices, models, inference, applications and security. Every guide lists versions, environment and reproduction status." },
     filters: { zh: ["全部", "入门", "推理引擎", "本地 Agent", "RAG", "端侧 AI"], en: ["All", "Beginner", "Inference engines", "Local agents", "RAG", "On-device AI"] },
-    cards: [
-      { tag: { zh: "入门 · 12分钟", en: "Beginner · 12 min" }, title: { zh: "在一台普通电脑上运行第一个本地模型", en: "Run your first local model on an ordinary computer" }, text: { zh: "从设备检查、模型选择到完成第一次对话，不要求独立显卡。", en: "From checking your device and choosing a model to your first chat — no dedicated GPU required." }, meta: { zh: "待复现 · 2026-09-15", en: "Pending reproduction · 2026-09-15" }, accent: "green", slug: "run-first-local-model" },
-      { tag: { zh: "推理引擎 · 18分钟", en: "Inference engines · 18 min" }, title: { zh: "Ollama、llama.cpp 与 LM Studio 应该怎样选择？", en: "Ollama, llama.cpp or LM Studio — how to choose?" }, text: { zh: "从易用性、性能、API、平台支持与可维护性进行比较。", en: "Comparing ease of use, performance, APIs, platform support and maintainability." }, meta: { zh: "对比指南 · 6 个环境", en: "Comparison guide · 6 environments" }, accent: "orange" },
-      { tag: { zh: "本地 Agent · 26分钟", en: "Local agents · 26 min" }, title: { zh: "让编程 Agent 使用你自己的本地模型", en: "Let coding agents use your own local model" }, text: { zh: "搭建兼容 API，配置工具调用，并理解上下文与性能边界。", en: "Set up a compatible API, configure tool calling, and understand context and performance limits." }, meta: { zh: "进阶 · 附配置文件", en: "Advanced · Config files included" }, accent: "blue" },
-      { tag: { zh: "RAG · 34分钟", en: "RAG · 34 min" }, title: { zh: "构建完全离线的个人文档知识库", en: "Build a fully offline personal document knowledge base" }, text: { zh: "文档解析、嵌入模型、向量检索与答案引用的完整实践。", en: "Document parsing, embedding models, vector search and cited answers — end to end." }, meta: { zh: "项目教程 · 可运行", en: "Project tutorial · Runnable" }, accent: "purple" },
-    ],
+    cards: [],
   },
   benchmarks: {
     eyebrow: "OPEN BENCHMARKS",
@@ -104,7 +99,7 @@ const content: Record<Exclude<View, "home">, SectionContent> = {
     cards: [
       { tag: { zh: "工作组 · 周三", en: "Working group · Wed" }, title: { zh: "开放评测工作组例会", en: "Open benchmark working group meeting" }, text: { zh: "讨论设备信息模板、性能指标和首轮联合评测清单。", en: "Discuss device info templates, performance metrics and the first joint benchmark list." }, meta: { zh: "线上 · 41 人关注", en: "Online · 41 watching" }, accent: "green" },
       { tag: { zh: "Demo Day · 周六", en: "Demo Day · Sat" }, title: { zh: "把你的 Local AI 应用带来演示", en: "Bring your Local AI app to demo" }, text: { zh: "每个项目10分钟：演示、技术选择、踩坑与下一步需求。", en: "10 minutes each: demo, tech choices, pitfalls and next needs." }, meta: { zh: "开放报名 · 8 个席位", en: "Open signup · 8 slots" }, accent: "orange" },
-      { tag: { zh: "贡献指南", en: "Contribution guide" }, title: { zh: "第一次贡献，不一定从写代码开始", en: "Your first contribution doesn't have to be code" }, text: { zh: "复现教程、补充设备数据、整理问答，都能成为有效贡献。", en: "Reproducing tutorials, adding device data or organizing Q&A all count." }, meta: { zh: "6 条推荐路径", en: "6 recommended paths" }, accent: "blue" },
+      { tag: { zh: "贡献指南", en: "Contribution guide" }, title: { zh: "怎样给 Local AI Club 写一篇文章", en: "How to contribute an article to Local AI Club" }, text: { zh: "用一对 Markdown 文件提交中英双语文章：路径、frontmatter 和正文必须对齐。", en: "Submit bilingual articles as a Markdown pair. Paths, frontmatter and body must stay aligned." }, meta: { zh: "待复现 · 2026-09-15", en: "Pending · 2026-09-15" }, accent: "blue", slug: "article-contribution-guide" },
       { tag: { zh: "每周通讯", en: "Weekly newsletter" }, title: { zh: "Local AI Weekly #001", en: "Local AI Weekly #001" }, text: { zh: "精选项目更新、实测数据、教程、悬赏和社区活动。", en: "Curated project updates, benchmark data, tutorials, bounties and events." }, meta: { zh: "每周一发送 · 免费订阅", en: "Mondays · Free subscription" }, accent: "purple" },
     ],
   },
@@ -398,7 +393,7 @@ export default function SitePage({
               ? <a className={`content-card ${card.accent}`} key={card.slug} href={articleToPath(lang, view, card.slug)}>{body}</a>
               : <article className={`content-card ${card.accent}`} key={card.title[lang]}>{body}</article>;
           })}{visibleCards.length === 0 && <div className="empty-state"><strong>{t.empty.title}</strong><span>{t.empty.desc}</span><button onClick={() => setQuery("")}>{t.empty.clear}</button></div>}</div>
-            <aside className="section-aside"><span className="aside-label">{t.aside.label}</span><h3>{asideTitle}</h3><p>{asideBody}</p><button>{t.aside.cta}</button><div className="aside-stat"><strong>100+</strong><span>{t.aside.stat}</span></div></aside>
+            <aside className="section-aside"><span className="aside-label">{t.aside.label}</span><h3>{asideTitle}</h3><p>{asideBody}</p><a href={articleToPath(lang, "community", "article-contribution-guide")}>{t.aside.cta}</a><div className="aside-stat"><strong>100+</strong><span>{t.aside.stat}</span></div></aside>
           </div>
         </section>
       </main> : null}
