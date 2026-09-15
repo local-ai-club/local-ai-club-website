@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getPublishedArticleList } from "../lib/articles";
 import SitePage from "./SitePage";
 import { isSection, type Lang } from "../lib/i18n-routes";
 
@@ -13,5 +14,12 @@ export default function SectionPageRoute({
     notFound();
   }
 
-  return <SitePage key={section} lang={lang} view={section} />;
+  return (
+    <SitePage
+      key={section}
+      lang={lang}
+      view={section}
+      articles={getPublishedArticleList(section, lang)}
+    />
+  );
 }

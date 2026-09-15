@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { viewToPath, type Lang, type View } from "./i18n-routes";
+import { getArticleTranslation, type ArticleRecord } from "./articles";
+import { articleToPath, viewToPath, type Lang, type View } from "./i18n-routes";
 
 const siteUrl = process.env.SITE_URL ?? process.env.CF_PAGES_URL ?? "https://local-ai.club";
 const siteRoot = new URL(siteUrl.endsWith("/") ? siteUrl : `${siteUrl}/`);
@@ -124,6 +125,44 @@ export function buildPageMetadata(lang: Lang, view: View): Metadata {
         "zh-CN": viewToPath("zh", view),
         en: viewToPath("en", view),
       },
+    },
+  };
+}
+
+export function buildArticleMetadata(article: ArticleRecord): Metadata {
+  const canonicalPath = articleToPath(article.lang, article.section, article.slug);
+  const translation = getArticleTranslation(article);
+  const languages: Record<string, string> = {
+    [article.lang === "zh" ? "zh-CN" : "en"]: canonicalPath,
+  };
+
+  if (translation) {
+    languages[translation.lang === "zh" ? "zh-CN" : "en"] = articleToPath(
+      translation.lang,
+      translation.section,
+      translation.slug,
+    );
+  }
+
+  return {
+    title: `${article.title} · Local AI Club`,
+    description: article.summary,
+    openGraph: {
+      title: article.title,
+      description: article.summary,
+      type: "article",
+      url: new URL(canonicalPath.slice(1), siteRoot).toString(),
+      images: [{ url: ogImage, width: 1200, height: 630, alt: "Local AI Club" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.summary,
+      images: [ogImage],
+    },
+    alternates: {
+      canonical: canonicalPath,
+      languages,
     },
   };
 }
