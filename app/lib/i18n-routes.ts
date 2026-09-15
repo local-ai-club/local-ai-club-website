@@ -26,6 +26,10 @@ export function viewToPath(lang: Lang, view: View): string {
   return lang === "en" ? `/en/${view}` : `/${view}`;
 }
 
+export function articleToPath(lang: Lang, section: Section, slug: string): string {
+  return `${viewToPath(lang, section)}/${slug}`;
+}
+
 export function toggleLangPath(lang: Lang, view: View): string {
   return viewToPath(lang === "zh" ? "en" : "zh", view);
 }

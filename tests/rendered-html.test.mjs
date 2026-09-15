@@ -63,6 +63,19 @@ test("renders localized section routes", async () => {
   assert.match(agents, /hrefLang="zh-CN" href="https:\/\/local-ai\.club\/agents"/);
 });
 
+test("renders a Velite article in both languages", async () => {
+  const zh = await fetchHtml("/learn/run-first-local-model");
+  assert.match(zh, /<title>在一台普通电脑上运行第一个本地模型 · Local AI Club<\/title>/i);
+  assert.match(zh, /从设备检查、模型选择到完成第一次对话/);
+  assert.match(zh, /ollama --version/);
+  assert.match(zh, /hrefLang="en" href="https:\/\/local-ai\.club\/en\/learn\/run-first-local-model"/);
+
+  const en = await fetchHtml("/en/learn/run-first-local-model");
+  assert.match(en, /<title>Run your first local model on an ordinary computer · Local AI Club<\/title>/i);
+  assert.match(en, /From checking your device and choosing a model/);
+  assert.match(en, /hrefLang="zh-CN" href="https:\/\/local-ai\.club\/learn\/run-first-local-model"/);
+});
+
 test("exports a complete static Pages artifact", async () => {
   const html = await readFile(
     new URL("../dist/client/index.html", import.meta.url),
@@ -91,4 +104,6 @@ test("exports a complete static Pages artifact", async () => {
   assert.match(html, /(?:href|src)="\/assets\//);
   assert.doesNotMatch(html, /\/local-ai-club-website\/assets\//);
   await access(new URL("../dist/client/.nojekyll", import.meta.url));
+  await access(new URL("../dist/client/learn/run-first-local-model/index.html", import.meta.url));
+  await access(new URL("../dist/client/en/learn/run-first-local-model/index.html", import.meta.url));
 });

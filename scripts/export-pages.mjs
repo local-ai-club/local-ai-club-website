@@ -5,9 +5,24 @@ const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("pages-export", `${Date.now()}`);
 
 const { default: worker } = await import(workerUrl.href);
-const { allLocalizedRoutes } = await import("../app/lib/i18n-routes.ts");
+const { allLocalizedRoutes, articleToPath } = await import("../app/lib/i18n-routes.ts");
+const { default: articles } = await import("../.velite/articles.json", {
+  with: { type: "json" },
+});
+const articleRoutes = articles
+  .filter((article) => article.status === "published")
+  .map((article) => {
+    const pathname = articleToPath(article.lang, article.section, article.slug);
 
-for (const route of allLocalizedRoutes()) {
+    return {
+      path: `https://local-ai.club${pathname}`,
+      output: `${pathname.slice(1)}/index.html`,
+      marker: article.title,
+    };
+  });
+const exportRoutes = [...allLocalizedRoutes(), ...articleRoutes];
+
+for (const route of exportRoutes) {
   const response = await worker.fetch(
     new Request(route.path, {
       headers: { accept: "text/html" },
@@ -46,4 +61,4 @@ await Promise.all([
   writeFile(new URL(".nojekyll", outputDirectory), "", "utf8"),
 ]);
 
-console.log(`Static Pages artifact exported to dist/client (${allLocalizedRoutes().length} routes)`);
+console.log(`Static Pages artifact exported to dist/client (${exportRoutes.length} routes)`);

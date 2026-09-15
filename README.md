@@ -49,6 +49,7 @@ Cloudflare Preview 的分支设置和验收方式见
 
 ```text
 app/        页面、交互与全局样式
+content/    Velite 驱动的 Markdown 文章
 public/     Logo、图标与品牌分享图
 worker/     Cloudflare Worker 入口
 docs/       社区方案、产品需求文档与汇报材料

@@ -12,11 +12,19 @@ command -v timeout || {
   exit 69
 }
 
+velite="${SITES_PROJECT_ROOT}/node_modules/.bin/velite"
 vinext="${SITES_PROJECT_ROOT}/node_modules/.bin/vinext"
+if [[ ! -x "${velite}" ]]; then
+  echo "velite is unavailable. Run npm run install:ci and wait for it to finish before building." >&2
+  exit 69
+fi
 if [[ ! -x "${vinext}" ]]; then
   echo "vinext is unavailable. Run npm run install:ci and wait for it to finish before building." >&2
   exit 69
 fi
+
+echo "Compiling Markdown content with velite..."
+"${velite}"
 
 echo "Running bounded vinext build..."
 timeout \

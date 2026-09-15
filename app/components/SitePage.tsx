@@ -1,25 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
-  toggleLangPath,
+  articleToPath,
   viewToPath,
   type Lang,
   type View,
 } from "../lib/i18n-routes";
-type Accent = "green" | "orange" | "blue" | "purple";
+import SiteChrome from "./SiteChrome";
 
-const navItems: { id: View; zh: string; en: string }[] = [
-  { id: "home", zh: "首页", en: "Home" },
-  { id: "learn", zh: "学习", en: "Learn" },
-  { id: "benchmarks", zh: "评测", en: "Benchmarks" },
-  { id: "projects", zh: "项目", en: "Projects" },
-  { id: "agents", zh: "Agent", en: "Enterprise" },
-  { id: "bounties", zh: "悬赏", en: "Bounties" },
-  { id: "community", zh: "社区", en: "Community" },
-];
+type Accent = "green" | "orange" | "blue" | "purple";
 
 type Bi = { zh: string; en: string };
 
@@ -29,6 +21,7 @@ type SectionCard = {
   text: Bi;
   meta: Bi;
   accent: Accent;
+  slug?: string;
 };
 
 type SectionContent = {
@@ -46,7 +39,7 @@ const content: Record<Exclude<View, "home">, SectionContent> = {
     intro: { zh: "围绕设备、模型、推理、应用与安全组织的连续知识体系。每篇实践内容都标明版本、环境与复现状态。", en: "A continuous body of knowledge organized around devices, models, inference, applications and security. Every guide lists versions, environment and reproduction status." },
     filters: { zh: ["全部", "入门", "推理引擎", "本地 Agent", "RAG", "端侧 AI"], en: ["All", "Beginner", "Inference engines", "Local agents", "RAG", "On-device AI"] },
     cards: [
-      { tag: { zh: "入门 · 12分钟", en: "Beginner · 12 min" }, title: { zh: "在一台普通电脑上运行第一个本地模型", en: "Run your first local model on an ordinary computer" }, text: { zh: "从设备检查、模型选择到完成第一次对话，不要求独立显卡。", en: "From checking your device and choosing a model to your first chat — no dedicated GPU required." }, meta: { zh: "已复现 · 更新于 2 天前", en: "Reproduced · Updated 2 days ago" }, accent: "green" },
+      { tag: { zh: "入门 · 12分钟", en: "Beginner · 12 min" }, title: { zh: "在一台普通电脑上运行第一个本地模型", en: "Run your first local model on an ordinary computer" }, text: { zh: "从设备检查、模型选择到完成第一次对话，不要求独立显卡。", en: "From checking your device and choosing a model to your first chat — no dedicated GPU required." }, meta: { zh: "待复现 · 2026-09-15", en: "Pending reproduction · 2026-09-15" }, accent: "green", slug: "run-first-local-model" },
       { tag: { zh: "推理引擎 · 18分钟", en: "Inference engines · 18 min" }, title: { zh: "Ollama、llama.cpp 与 LM Studio 应该怎样选择？", en: "Ollama, llama.cpp or LM Studio — how to choose?" }, text: { zh: "从易用性、性能、API、平台支持与可维护性进行比较。", en: "Comparing ease of use, performance, APIs, platform support and maintainability." }, meta: { zh: "对比指南 · 6 个环境", en: "Comparison guide · 6 environments" }, accent: "orange" },
       { tag: { zh: "本地 Agent · 26分钟", en: "Local agents · 26 min" }, title: { zh: "让编程 Agent 使用你自己的本地模型", en: "Let coding agents use your own local model" }, text: { zh: "搭建兼容 API，配置工具调用，并理解上下文与性能边界。", en: "Set up a compatible API, configure tool calling, and understand context and performance limits." }, meta: { zh: "进阶 · 附配置文件", en: "Advanced · Config files included" }, accent: "blue" },
       { tag: { zh: "RAG · 34分钟", en: "RAG · 34 min" }, title: { zh: "构建完全离线的个人文档知识库", en: "Build a fully offline personal document knowledge base" }, text: { zh: "文档解析、嵌入模型、向量检索与答案引用的完整实践。", en: "Document parsing, embedding models, vector search and cited answers — end to end." }, meta: { zh: "项目教程 · 可运行", en: "Project tutorial · Runnable" }, accent: "purple" },
@@ -115,14 +108,7 @@ const content: Record<Exclude<View, "home">, SectionContent> = {
 };
 
 const zh = {
-  brandAria: "返回 Local AI Club 首页",
-  navAria: "主要导航",
   signalAria: "Local AI 技术范围",
-  search: "搜索",
-  join: "加入社区",
-  menu: "展开菜单",
-  toggleLangAria: "切换为 English",
-  toggleLangLabel: "EN",
   heroH1: { before: "让 AI 在", em: "自己的设备", after: "上运行" },
   heroDesc: "面向本地、端侧、边缘与私有化 AI 的开放技术社区。学习技术、选择模型、复现评测、参与项目，共同解决真实问题。",
   matchDevice: "匹配我的设备",
@@ -184,27 +170,10 @@ const zh = {
     stat: "首年公共成果目标",
   },
   cardOpen: (title: string) => `打开${title}`,
-  footerLinks: [
-    { label: "学习", view: "learn" },
-    { label: "评测", view: "benchmarks" },
-    { label: "项目", view: "projects" },
-    { label: "Agent", view: "agents" },
-    { label: "关于社区", view: "community" },
-  ],
-  footerTagline: "Run AI Locally. Build AI Together.",
-  footerDisclaimer: "Local AI Club 是独立开放技术社区，与 LocalAI 开源项目不存在隶属关系。",
-  footerCopyright: "© 2026 Local AI Club · local-ai.club",
 };
 
 const en: typeof zh = {
-  brandAria: "Back to Local AI Club home",
-  navAria: "Main navigation",
   signalAria: "Local AI tech scope",
-  search: "Search",
-  join: "Join community",
-  menu: "Open menu",
-  toggleLangAria: "切换到中文",
-  toggleLangLabel: "中",
   heroH1: { before: "Run AI", em: "on your own device", after: "" },
   heroDesc: "An open technical community for local, on-device, edge and private AI. Learn the tech, choose models, reproduce benchmarks, join projects and solve real problems together.",
   matchDevice: "Match my device",
@@ -266,16 +235,6 @@ const en: typeof zh = {
     stat: "year-one public outcomes goal",
   },
   cardOpen: (title: string) => `Open ${title}`,
-  footerLinks: [
-    { label: "Learn", view: "learn" },
-    { label: "Benchmarks", view: "benchmarks" },
-    { label: "Projects", view: "projects" },
-    { label: "Agents", view: "agents" },
-    { label: "About", view: "community" },
-  ],
-  footerTagline: "Run AI Locally. Build AI Together.",
-  footerDisclaimer: "Local AI Club is an independent open technical community and is not affiliated with the LocalAI open-source project.",
-  footerCopyright: "© 2026 Local AI Club · local-ai.club",
 };
 
 const ui: Record<Lang, typeof zh> = { zh, en };
@@ -296,13 +255,8 @@ const purposeChoices = [
   { key: "vision", zh: "视觉理解", en: "Vision" },
 ];
 
-function BrandMark() {
-  return <Image className="brand-mark" src="/logo.png" alt="Local AI Club logo" width={1254} height={1254} unoptimized />;
-}
-
 export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
   const router = useRouter();
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [platform, setPlatform] = useState("apple");
   const [memory, setMemory] = useState("32");
   const [purpose, setPurpose] = useState("chat");
@@ -311,10 +265,6 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
   const [query, setQuery] = useState("");
 
   const t = ui[lang];
-
-  useEffect(() => {
-    document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
-  }, [lang]);
 
   const recommendation = useMemo(() => {
     if (platform === "cpu") return { model: "Qwen 3 · 4B · Q4_K_M", engine: "llama.cpp", speed: { zh: "约 8—18 tok/s", en: "≈ 8–18 tok/s" }, note: { zh: "适合轻量对话与文档摘要", en: "Good for light chat and document summarization" } };
@@ -330,13 +280,8 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
   function go(next: View) {
     setFilter(0);
     setQuery("");
-    setMobileOpen(false);
     router.push(viewToPath(lang, next));
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function toggleLang() {
-    router.push(toggleLangPath(lang, view));
   }
 
   const section = view === "home" ? null : content[view];
@@ -352,22 +297,7 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
   const asideBody = view === "bounties" ? t.aside.bodies.bounties : view === "agents" ? t.aside.bodies.agents : t.aside.bodies.default;
 
   return (
-    <div className="site-shell">
-      <header className="topbar">
-        <button className="brand" onClick={() => go("home")} aria-label={t.brandAria}>
-          <BrandMark /><span className="brand-copy"><strong>LOCAL AI</strong><small>CLUB</small></span>
-        </button>
-        <nav className={mobileOpen ? "main-nav open" : "main-nav"} aria-label={t.navAria}>
-          {navItems.map((item) => <button key={item.id} className={view === item.id ? "nav-item active" : "nav-item"} onClick={() => go(item.id)}><span>{item[lang]}</span><small>{item[lang === "zh" ? "en" : "zh"]}</small></button>)}
-        </nav>
-        <div className="header-actions">
-          <button className="search-icon" aria-label={t.search} onClick={() => view !== "home" && document.getElementById("section-search")?.focus()}>⌕</button>
-          <button className="lang-toggle" onClick={toggleLang} aria-label={t.toggleLangAria}>{t.toggleLangLabel}</button>
-          <button className="join-button" onClick={() => go("community")}>{t.join} <span>↗</span></button>
-          <button className="menu-button" aria-label={t.menu} aria-expanded={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)}>☰</button>
-        </div>
-      </header>
-
+    <SiteChrome lang={lang} view={view}>
       {view === "home" ? <main>
         <section className="hero">
           <div className="hero-grid" aria-hidden="true" />
@@ -390,14 +320,14 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
           <div className="lab-heading"><div><h2>{t.labTitle}</h2><p>{t.labDesc}</p></div><span className="community-data">{t.labNote}</span></div>
           <div className="lab-console">
             <div className="lab-controls"><ChoiceGroup label={t.platformLabel} value={platform} values={platformChoices} lang={lang} onChange={setPlatform} /><ChoiceGroup label={t.memoryLabel} value={memory} values={memoryChoices} lang={lang} onChange={setMemory} /><ChoiceGroup label={t.purposeLabel} value={purpose} values={purposeChoices} lang={lang} onChange={setPurpose} /><button className="match-button" onClick={() => setRanMatcher(true)}>{t.generate} <span>→</span></button></div>
-            <div className={ranMatcher ? "recommendation revealed" : "recommendation"}><div className="rec-head"><span>RECOMMENDED STACK</span><span className="confidence">{t.recMatch}</span></div><div className="rec-number">01</div><span className="rec-label">{t.recLabel}</span><h3>{recommendation.model}</h3><div className="rec-grid"><div><span>{t.recEngine}</span><strong>{recommendation.engine}</strong></div><div><span>{t.recSpeed}</span><strong>{recommendation.speed[lang]}</strong></div></div><p>{recommendation.note[lang]}{t.recSuffix}</p><div className="rec-actions"><button onClick={() => go("learn")}>{t.recInstall}</button><button onClick={() => go("benchmarks")}>{t.recBench}</button></div></div>
+            <div className={ranMatcher ? "recommendation revealed" : "recommendation"}><div className="rec-head"><span>RECOMMENDED STACK</span><span className="confidence">{t.recMatch}</span></div><div className="rec-number">01</div><span className="rec-label">{t.recLabel}</span><h3>{recommendation.model}</h3><div className="rec-grid"><div><span>{t.recEngine}</span><strong>{recommendation.engine}</strong></div><div><span>{t.recSpeed}</span><strong>{recommendation.speed[lang]}</strong></div></div><p>{recommendation.note[lang]}{t.recSuffix}</p><div className="rec-actions"><a href={articleToPath(lang, "learn", "run-first-local-model")}>{t.recInstall}</a><button onClick={() => go("benchmarks")}>{t.recBench}</button></div></div>
           </div>
         </section>
 
         <section className="radar-section">
           <div className="section-title-row"><div><span>COMMUNITY RADAR</span><h2>{t.radarTitle}</h2></div><button onClick={() => go("learn")}>{t.radarAll}</button></div>
           <div className="radar-grid">
-            <article className="feature-card dark-card"><span className="card-index">01 / GUIDE</span><h3>{t.radar[0].line1}<br />{t.radar[0].line2}</h3><p>{t.radar[0].desc}</p><button onClick={() => go("learn")}>{t.radar[0].cta} ↗</button><div className="mini-terminal"><span>$ local-ai check --device</span><span className="terminal-ok">✓ 32GB unified memory</span><span className="terminal-ok">✓ local inference ready</span></div></article>
+            <article className="feature-card dark-card"><span className="card-index">01 / GUIDE</span><h3>{t.radar[0].line1}<br />{t.radar[0].line2}</h3><p>{t.radar[0].desc}</p><a href={articleToPath(lang, "learn", "run-first-local-model")}>{t.radar[0].cta} ↗</a><div className="mini-terminal"><span>$ local-ai check --device</span><span className="terminal-ok">✓ 32GB unified memory</span><span className="terminal-ok">✓ local inference ready</span></div></article>
             <article className="feature-card"><span className="card-index green">02 / BENCHMARK</span><h3>{t.radar[1].line1}<br />{t.radar[1].line2}</h3><p>{t.radar[1].desc}</p><div className="metric"><strong>42.8</strong><span>tok/s<br />{t.metricLabel}</span></div><button onClick={() => go("benchmarks")}>{t.radar[1].cta} →</button></article>
             <article className="feature-card bounty-feature"><span className="card-index orange">03 / BOUNTY</span><h3>{t.radar[2].line1}<br />{t.radar[2].line2}</h3><p>{t.radar[2].desc}</p><div className="reward"><span>{t.rewardLabel}</span><strong>¥8,000</strong></div><button onClick={() => go("bounties")}>{t.radar[2].cta} →</button></article>
           </div>
@@ -407,14 +337,13 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
       </main> : section ? <main className="section-page">
         <section className="section-hero"><span>{section.eyebrow}</span><h1>{section.title[lang]}</h1><p>{section.intro[lang]}</p></section>
         <section className="explorer"><div className="explorer-bar"><div className="filters">{section.filters[lang].map((item, index) => <button key={item} className={filter === index ? "active" : ""} onClick={() => setFilter(index)}>{item}</button>)}</div><label className="section-search"><span>⌕</span><input id="section-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchPlaceholder} /></label></div>
-          <div className="content-layout"><div className="content-grid">{visibleCards?.map((card, index) => <article className={`content-card ${card.accent}`} key={card.title[lang]}><div className="content-number">{String(index + 1).padStart(2, "0")}</div><span>{card.tag[lang]}</span><h2>{card.title[lang]}</h2><p>{card.text[lang]}</p><footer><small>{card.meta[lang]}</small><button aria-label={t.cardOpen(card.title[lang])}>↗</button></footer></article>)}{visibleCards?.length === 0 && <div className="empty-state"><strong>{t.empty.title}</strong><span>{t.empty.desc}</span><button onClick={() => setQuery("")}>{t.empty.clear}</button></div>}</div>
+          <div className="content-layout"><div className="content-grid">{visibleCards?.map((card, index) => <article className={`content-card ${card.accent}`} key={card.title[lang]}><div className="content-number">{String(index + 1).padStart(2, "0")}</div><span>{card.tag[lang]}</span><h2>{card.title[lang]}</h2><p>{card.text[lang]}</p><footer><small>{card.meta[lang]}</small>{card.slug && view !== "home" ? <a href={articleToPath(lang, view, card.slug)} aria-label={t.cardOpen(card.title[lang])}>↗</a> : <button aria-label={t.cardOpen(card.title[lang])} disabled>↗</button>}</footer></article>)}{visibleCards?.length === 0 && <div className="empty-state"><strong>{t.empty.title}</strong><span>{t.empty.desc}</span><button onClick={() => setQuery("")}>{t.empty.clear}</button></div>}</div>
             <aside className="section-aside"><span className="aside-label">{t.aside.label}</span><h3>{asideTitle}</h3><p>{asideBody}</p><button>{t.aside.cta}</button><div className="aside-stat"><strong>100+</strong><span>{t.aside.stat}</span></div></aside>
           </div>
         </section>
       </main> : null}
 
-      <footer className="footer"><div className="footer-brand"><BrandMark /><div><strong>LOCAL AI CLUB</strong><span>{t.footerTagline}</span></div></div><div className="footer-links">{t.footerLinks.map((link) => <button key={link.view} onClick={() => go(link.view as View)}>{link.label}</button>)}</div><p>{t.footerDisclaimer}<br />{t.footerCopyright}</p></footer>
-    </div>
+    </SiteChrome>
   );
 }
 
