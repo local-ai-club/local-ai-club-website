@@ -3,10 +3,12 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import type { ArticleListItem } from "../lib/articles";
 import {
   articleToPath,
   viewToPath,
   type Lang,
+  type Section,
   type View,
 } from "../lib/i18n-routes";
 import SiteChrome from "./SiteChrome";
@@ -22,6 +24,7 @@ type SectionCard = {
   meta: Bi;
   accent: Accent;
   slug?: string;
+  labels?: string[];
 };
 
 type SectionContent = {
@@ -170,6 +173,9 @@ const zh = {
     stat: "首年公共成果目标",
   },
   cardOpen: (title: string) => `打开${title}`,
+  cardRead: "阅读全文",
+  difficulty: { beginner: "入门", intermediate: "进阶", advanced: "高级" },
+  reproStatus: { draft: "草稿", reproduced: "已复现", pending: "待复现", failed: "复现失败" },
 };
 
 const en: typeof zh = {
@@ -235,9 +241,45 @@ const en: typeof zh = {
     stat: "year-one public outcomes goal",
   },
   cardOpen: (title: string) => `Open ${title}`,
+  cardRead: "Read article",
+  difficulty: { beginner: "Beginner", intermediate: "Intermediate", advanced: "Advanced" },
+  reproStatus: { draft: "Draft", reproduced: "Reproduced", pending: "Pending", failed: "Failed" },
 };
 
 const ui: Record<Lang, typeof zh> = { zh, en };
+
+const accents: Accent[] = ["green", "orange", "blue", "purple"];
+
+function articleToCard(article: ArticleListItem, lang: Lang, accent: Accent): SectionCard {
+  const labels = ui[lang];
+  const tag = `${labels.difficulty[article.difficulty]} · ${article.readTime}${lang === "zh" ? "分钟" : " min"}`;
+  const meta = `${labels.reproStatus[article.reproStatus]} · ${article.publishedAt.slice(0, 10)}`;
+
+  return {
+    tag: { zh: tag, en: tag },
+    title: { zh: article.title, en: article.title },
+    text: { zh: article.summary, en: article.summary },
+    meta: { zh: meta, en: meta },
+    accent,
+    slug: article.slug,
+    labels: [...article.tags, labels.difficulty[article.difficulty]],
+  };
+}
+
+function mergeSectionCards(
+  view: Section,
+  lang: Lang,
+  articles: ArticleListItem[],
+): SectionCard[] {
+  const published = articles.map((article, index) =>
+    articleToCard(article, lang, accents[index % accents.length]),
+  );
+  const placeholders = content[view].cards.filter(
+    (card) => !card.slug || !articles.some((article) => article.slug === card.slug),
+  );
+
+  return [...published, ...placeholders];
+}
 
 const platformChoices = [
   { key: "apple", zh: "Apple Silicon", en: "Apple Silicon" },
@@ -255,7 +297,15 @@ const purposeChoices = [
   { key: "vision", zh: "视觉理解", en: "Vision" },
 ];
 
-export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
+export default function SitePage({
+  lang,
+  view,
+  articles = [],
+}: {
+  lang: Lang;
+  view: View;
+  articles?: ArticleListItem[];
+}) {
   const router = useRouter();
   const [platform, setPlatform] = useState("apple");
   const [memory, setMemory] = useState("32");
@@ -285,10 +335,15 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
   }
 
   const section = view === "home" ? null : content[view];
-  const visibleCards = section?.cards.filter((card, index) => {
+  const sectionCards = section && view !== "home" ? mergeSectionCards(view, lang, articles) : [];
+  const visibleCards = sectionCards.filter((card) => {
     const q = query.trim().toLowerCase();
-    const filterMatch = filter === 0 || index === (filter - 1) % section.cards.length;
-    const haystack = `${card.title[lang]} ${card.text[lang]} ${card.tag[lang]}`.toLowerCase();
+    const filterLabel = section?.filters[lang][filter] ?? "";
+    const haystack = `${card.title[lang]} ${card.text[lang]} ${card.tag[lang]} ${card.labels?.join(" ") ?? ""}`.toLowerCase();
+    const filterMatch =
+      filter === 0 ||
+      haystack.includes(filterLabel.toLowerCase()) ||
+      (card.labels?.some((label) => label === filterLabel) ?? false);
     const queryMatch = !q || haystack.includes(q);
     return filterMatch && queryMatch;
   });
@@ -337,7 +392,12 @@ export default function SitePage({ lang, view }: { lang: Lang; view: View }) {
       </main> : section ? <main className="section-page">
         <section className="section-hero"><span>{section.eyebrow}</span><h1>{section.title[lang]}</h1><p>{section.intro[lang]}</p></section>
         <section className="explorer"><div className="explorer-bar"><div className="filters">{section.filters[lang].map((item, index) => <button key={item} className={filter === index ? "active" : ""} onClick={() => setFilter(index)}>{item}</button>)}</div><label className="section-search"><span>⌕</span><input id="section-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.searchPlaceholder} /></label></div>
-          <div className="content-layout"><div className="content-grid">{visibleCards?.map((card, index) => <article className={`content-card ${card.accent}`} key={card.title[lang]}><div className="content-number">{String(index + 1).padStart(2, "0")}</div><span>{card.tag[lang]}</span><h2>{card.title[lang]}</h2><p>{card.text[lang]}</p><footer><small>{card.meta[lang]}</small>{card.slug && view !== "home" ? <a href={articleToPath(lang, view, card.slug)} aria-label={t.cardOpen(card.title[lang])}>↗</a> : <button aria-label={t.cardOpen(card.title[lang])} disabled>↗</button>}</footer></article>)}{visibleCards?.length === 0 && <div className="empty-state"><strong>{t.empty.title}</strong><span>{t.empty.desc}</span><button onClick={() => setQuery("")}>{t.empty.clear}</button></div>}</div>
+          <div className="content-layout"><div className="content-grid">{visibleCards.map((card, index) => {
+            const body = <><div className="content-number">{String(index + 1).padStart(2, "0")}</div><span>{card.tag[lang]}</span><h2>{card.title[lang]}</h2><p>{card.text[lang]}</p><footer><small>{card.meta[lang]}</small>{card.slug ? <span className="card-cta">{t.cardRead} ↗</span> : <button aria-label={t.cardOpen(card.title[lang])} disabled>↗</button>}</footer></>;
+            return card.slug && view !== "home"
+              ? <a className={`content-card ${card.accent}`} key={card.slug} href={articleToPath(lang, view, card.slug)}>{body}</a>
+              : <article className={`content-card ${card.accent}`} key={card.title[lang]}>{body}</article>;
+          })}{visibleCards.length === 0 && <div className="empty-state"><strong>{t.empty.title}</strong><span>{t.empty.desc}</span><button onClick={() => setQuery("")}>{t.empty.clear}</button></div>}</div>
             <aside className="section-aside"><span className="aside-label">{t.aside.label}</span><h3>{asideTitle}</h3><p>{asideBody}</p><button>{t.aside.cta}</button><div className="aside-stat"><strong>100+</strong><span>{t.aside.stat}</span></div></aside>
           </div>
         </section>

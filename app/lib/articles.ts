@@ -7,6 +7,19 @@ function isPublished(article: ArticleRecord): boolean {
   return article.status === "published";
 }
 
+export type ArticleListItem = Pick<
+  ArticleRecord,
+  | "slug"
+  | "section"
+  | "title"
+  | "summary"
+  | "tags"
+  | "difficulty"
+  | "readTime"
+  | "publishedAt"
+  | "reproStatus"
+>;
+
 export function getPublishedArticles(lang?: Lang): ArticleRecord[] {
   return articles.filter(
     (article) =>
@@ -14,6 +27,37 @@ export function getPublishedArticles(lang?: Lang): ArticleRecord[] {
       isSection(article.section) &&
       (lang === undefined || article.lang === lang),
   );
+}
+
+export function getPublishedArticleList(
+  section: Section,
+  lang: Lang,
+): ArticleListItem[] {
+  return getPublishedArticles(lang)
+    .filter((article) => article.section === section)
+    .map(
+      ({
+        slug,
+        section: articleSection,
+        title,
+        summary,
+        tags,
+        difficulty,
+        readTime,
+        publishedAt,
+        reproStatus,
+      }) => ({
+        slug,
+        section: articleSection,
+        title,
+        summary,
+        tags,
+        difficulty,
+        readTime,
+        publishedAt,
+        reproStatus,
+      }),
+    );
 }
 
 export function getArticle(

@@ -1,9 +1,11 @@
+import ArticleBody from "./ArticleBody";
+import { enhanceArticleHtml } from "../lib/article-html";
+import { getArticleTranslation, type ArticleRecord } from "../lib/articles";
 import {
   articleToPath,
   viewToPath,
   type Lang,
 } from "../lib/i18n-routes";
-import { getArticleTranslation, type ArticleRecord } from "../lib/articles";
 import SiteChrome from "./SiteChrome";
 
 const copy = {
@@ -89,7 +91,7 @@ export default function ArticleView({ article }: { article: ArticleRecord }) {
           </ul>
         </header>
         <section className="article-layout">
-          <article className="article-body" dangerouslySetInnerHTML={{ __html: article.body }} />
+          <ArticleBody html={enhanceArticleHtml(article.body, lang)} lang={lang} />
           <aside className="article-aside">
             <span className="aside-label">{t.environment}</span>
             <dl>
