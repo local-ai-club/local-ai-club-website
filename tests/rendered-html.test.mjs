@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { access, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function fetchHtml(path) {
@@ -103,6 +103,17 @@ test("renders the article contribution guide in both languages", async () => {
   assert.match(en, /hrefLang="zh-CN" href="https:\/\/local-ai\.club\/community\/article-contribution-guide"/);
 });
 
+test("article pages keep a single h1 and localize footnote chrome", async () => {
+  const zh = await fetchHtml("/learn/for-her-darkside-26b-a4b-intro");
+  const en = await fetchHtml("/en/learn/for-her-darkside-26b-a4b-intro");
+
+  assert.equal((zh.match(/<h1[ >]/g) ?? []).length, 1);
+  assert.equal((en.match(/<h1[ >]/g) ?? []).length, 1);
+  assert.match(zh, /id="footnote-label">脚注<\/h2>/);
+  assert.doesNotMatch(zh, />Footnotes</);
+  assert.match(en, /id="footnote-label">Footnotes<\/h2>/);
+});
+
 test("exports a complete static Pages artifact", async () => {
   const html = await readFile(
     new URL("../dist/client/index.html", import.meta.url),
@@ -136,4 +147,12 @@ test("exports a complete static Pages artifact", async () => {
   await access(new URL("../dist/client/en/learn/run-first-local-model/index.html", import.meta.url));
   await access(new URL("../dist/client/community/article-contribution-guide/index.html", import.meta.url));
   await access(new URL("../dist/client/en/community/article-contribution-guide/index.html", import.meta.url));
+
+  const assetsDir = new URL("../dist/client/assets/", import.meta.url);
+  const cssFiles = (await readdir(assetsDir)).filter((name) => name.endsWith(".css"));
+  assert.ok(cssFiles.length > 0, "expected hashed CSS in dist/client/assets");
+  const css = (
+    await Promise.all(cssFiles.map((name) => readFile(new URL(name, assetsDir), "utf8")))
+  ).join("\n");
+  assert.match(css, /\.sr-only\s*\{/);
 });
