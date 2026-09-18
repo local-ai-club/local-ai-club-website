@@ -12,7 +12,7 @@ updatedAt: 2026-09-18
 reproStatus: pending
 version: "0.1"
 license: CC-BY-4.0
-status: draft
+status: published
 environment:
   os: Linux / Windows / macOS
   engine: llama.cpp
